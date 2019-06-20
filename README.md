@@ -2,7 +2,7 @@
 
 ## Background
 
-I developed my original AM8833 arduino shield, and run it on a STM32 NUCLEO board in [this project](https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-F401RE/Thermography).
+I developed my original AMG8833 arduino shield, and run it on a STM32 NUCLEO board in [this project](https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-F401RE/Thermography).
 
 But the following problems remain:
 - The GUI based on matplotlib(Python) is so slow that it cannot playback the images at 10fps.
