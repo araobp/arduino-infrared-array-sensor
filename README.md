@@ -19,3 +19,10 @@ I also developed "rock, scissors and paper" classification based on X-CUBE-AI fr
 - An OpenCV-based video player on RasPi 3 shows the image frames at 10fps.
 - Interpolation is applied to the images to increase its resolution (32x32).
 - Some methods based on OpenCV is applied to the images to classify hand gestures, like rock, scissors and paper.
+
+## The benefits
+
+**All-in-one and very cheap development environment: Arduino IDE, g++, make, OpenCV and all the others run on RasPi 3. This is greate!**
+
+
+
