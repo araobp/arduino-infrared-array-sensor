@@ -17,7 +17,7 @@ Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasP
 ## Architecture
 
 ```
-    [GUI/RasPi3]/dev/ttyACMX----VCP/USB----[Arduino]----I2C----[AMG8833]
+    [GUI/RasPi3]/dev/ttyACM0----VCP/USB----[Arduino]----I2C----[AMG8833]
 ```
 
 ## Arduino shield of AMG8833
