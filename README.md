@@ -31,7 +31,7 @@ Note: the shield is powered by 3V3 pin on Arduino UNO. Although Arduino UNO is a
 
 ## Building and running GUI
 
-<img src="./doc/this_is_me.png" width=100>
+<img src="./doc/this_is_me.png" width=200>
 
 ```
 $ cd raspi
