@@ -45,8 +45,6 @@ $ bin/thermo
 
 GUI developed in a native language (c/c++) runs fast on RasPi 3!
 
-Note: "thermo" command must be excuted with superuser priviledge for the first time (after every system boot) to set the parameters to the tty port.
-
 ## Next features to be developed
 
 - Bicubic interpolation
