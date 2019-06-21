@@ -41,6 +41,9 @@ void enlarge(Mat &src, Mat &dst) {
   }
 }
 
+/*
+ * Super-impose temperature data on the image
+ */
 void putTempText(Mat &src, vector<string> &temp) {
 
   int font = FONT_HERSHEY_SIMPLEX;
@@ -53,7 +56,6 @@ void putTempText(Mat &src, vector<string> &temp) {
     for (int x = 0; x < 8; x++) {
       xx = x_offset + x * MAGNIFY;
       yy = y_offset + y * MAGNIFY;
-      //putText(src, temp[i++], Point(xx, yy), font, 1, Scalar(255,255,255), 1, LINE_AA);
       string &t = temp.at(i);
       putText(src, t, Point(xx, yy), font, 1, Scalar(255,255,255), 2, LINE_AA);
       i++;
@@ -99,7 +101,7 @@ int main(int argc, char* argv[]) {
 
   tcflush(fd, TCIFLUSH);
 
-  // Image 
+  // Image processing
   char buf[1];
   int bytes_read = 0;
   uint8_t frameBuf[64];
@@ -140,7 +142,7 @@ int main(int argc, char* argv[]) {
         }
       } else {
         frameBuf[idx++] = buf[i];
-        temp.push_back(to_string(buf[i]/4));
+        temp.push_back(to_string((buf[i]+2)/4));  // in Celsius (x 0.25)
       }
 #endif
     }
