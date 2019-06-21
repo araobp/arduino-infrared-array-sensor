@@ -1,25 +1,13 @@
-/**
-Reference for serial port on Linux:
-https://github.com/xanthium-enterprises/Serial-Port-Programming-on-Linux/blob/master/USB2SERIAL_Read/Reciever%20(PC%20Side)/SerialPort_read.c
-*/
-
 #include <iostream>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
 #include <opencv2/opencv.hpp>
-
-/*
- * Port connected to Arduino
- */
-//#define PORT "/dev/serial/by-id/usb-Arduino_Srl_Arduino_Uno_8543533323135181C251-if00"
-#define PORT "/dev/ttyACM0"
+#include <fcntl.h>
+#include <unistd.h>
+#include "main.hpp"
+#include "serialport.hpp"
 
 // Frame delimiter (assuming that the temperature is smaller that 0xFE)
 #define BEGIN 0xFE
 #define END 0xFF
-
-#define MAGNIFY 64 
 
 using namespace std;
 using namespace cv;
@@ -65,41 +53,7 @@ void putTempText(Mat &src, vector<string> &temp) {
 
 int main(int argc, char* argv[]) {
 
-  int fd;
-  struct termios settings;
-
-  fd = open(PORT, O_RDONLY | O_NOCTTY);
-
-  if (fd == -1) {
-    cout << "Error in opening tty" << endl;
-    exit(-1);
-  }
-
-  // Serial port settings
-  tcgetattr(fd, &settings);
-
-  cfsetospeed(&settings,B115200);
-
-  settings.c_cflag &= ~PARENB;
-  settings.c_cflag &= ~CSTOPB;
-  settings.c_cflag &= ~CSIZE;
-  settings.c_cflag |=  CS8;  
-  settings.c_cflag &= ~CRTSCTS;
-  settings.c_cflag |= CREAD | CLOCAL;
-  settings.c_iflag &= ~(IXON | IXOFF | IXANY);
-  settings.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-  settings.c_oflag &= ~OPOST;
-
-  // Blocking mode
-  settings.c_cc[VMIN] = 1;
-  settings.c_cc[VTIME] = 0;
-
-  if((tcsetattr(fd,TCSANOW,&settings)) != 0) {
-    cout << "Error in setting attributes" << endl;
-    exit(-1);
-  }
-
-  tcflush(fd, TCIFLUSH);
+  int fd = openSerialPort();
 
   // Image processing
   char buf[1];

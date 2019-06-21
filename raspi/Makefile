@@ -18,4 +18,4 @@ bin/%.o: src/%.cpp $(HEADERS)
 	  $(CXX) $< $(CXXFLAGS) $(LDFLAGS) -c -o $@
 
 clean:
-	  $(RM) $(OBJS) analyze 
+	  $(RM) $(OBJS) thermo 
