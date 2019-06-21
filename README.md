@@ -2,6 +2,8 @@
 
 (Work in progress)
 
+AMG8833 is an infrared array sensor product from Panasonic. It is very popular among Arduino users.
+
 ## Development environment
 
 - Arduino IDE on RasPi 3.
@@ -13,6 +15,10 @@
 ```
     [GUI/RasPi3]/dev/ttyACMX----VCP/USB----[Arduino]----I2C----[AMG8833]
 ```
+
+## Arduino shield of AMG8833
+
+**==>[schematic](./kicad)**
 
 ## Code
 
