@@ -19,3 +19,12 @@
 - [Arduino](./arduino)
 - [RasPi](./raspi)
 
+## Building and running GUI
+
+```
+$ cd raspi
+$ make
+$ bin/thermo
+```
+
+Note: "thermo" command must be excuted with superuser priviledge for the first time (after every system boot) to set the parameters to the tty port.
