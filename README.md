@@ -20,7 +20,9 @@ Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasP
 
 ## Arduino shield of AMG8833
 
-**==>[schematic](./kicad)**
+==>[schematic](./kicad)
+
+Note: the shield is powered by 3V3 pin on Arduino UNO. Although Arduino UNO is a 5V system, the circuit works.
 
 ## Code
 
