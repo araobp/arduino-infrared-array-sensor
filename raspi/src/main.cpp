@@ -41,6 +41,26 @@ void enlarge(Mat &src, Mat &dst) {
   }
 }
 
+void putTempText(Mat &src, vector<string> &temp) {
+
+  int font = FONT_HERSHEY_SIMPLEX;
+  int x_offset = 12;
+  int y_offset = MAGNIFY - 22;
+  int xx, yy;
+  int i = 0;
+
+  for (int y = 0; y < 8; y++) {
+    for (int x = 0; x < 8; x++) {
+      xx = x_offset + x * MAGNIFY;
+      yy = y_offset + y * MAGNIFY;
+      //putText(src, temp[i++], Point(xx, yy), font, 1, Scalar(255,255,255), 1, LINE_AA);
+      string &t = temp.at(i);
+      putText(src, t, Point(xx, yy), font, 1, Scalar(255,255,255), 2, LINE_AA);
+      i++;
+    }
+  }
+}
+
 int main(int argc, char* argv[]) {
 
   int fd;
@@ -109,13 +129,12 @@ int main(int argc, char* argv[]) {
         blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
         enlarged.convertTo(colored, CV_8UC3);
         applyColorMap(colored, colored, COLORMAP_JET);
+        if (idx >= 64) {
+          putTempText(colored, temp);
+        }
         imshow("Thermography", colored);
         char c = (char)waitKey(25);
         if (c == 'q') {
-          for (int i = 0; i < 63; i++) {
-            cout << temp[i] << ',';
-          }
-          cout << temp[63] << endl;
           close(fd);
           exit(0);
         }
