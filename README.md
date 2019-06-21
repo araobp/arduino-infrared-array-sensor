@@ -1,4 +1,4 @@
-# arduino-infrared-array-sensor
+# Arduino with infrared array sensor
 
 (Work in progress)
 
@@ -9,6 +9,8 @@ AMG8833 is an infrared array sensor product from Panasonic. It is very popular a
 - Arduino IDE on RasPi 3.
 - vi and g++ on RasPi 3.
 - OpenCV3 for thermography GUI development.
+
+Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasPi3 taking a half day.
 
 ## Architecture
 
