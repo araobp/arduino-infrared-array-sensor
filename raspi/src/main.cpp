@@ -1,5 +1,4 @@
 /**
- * vector<string> temp;
 Reference for serial port on Linux:
 https://github.com/xanthium-enterprises/Serial-Port-Programming-on-Linux/blob/master/USB2SERIAL_Read/Reciever%20(PC%20Side)/SerialPort_read.c
 */
@@ -110,7 +109,6 @@ int main(int argc, char* argv[]) {
         blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
         enlarged.convertTo(colored, CV_8UC3);
         applyColorMap(colored, colored, COLORMAP_JET);
-        //putTempText(colored, temp);
         imshow("Thermography", colored);
         char c = (char)waitKey(25);
         if (c == 'q') {
