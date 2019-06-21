@@ -133,8 +133,8 @@ int main(int argc, char* argv[]) {
         applyColorMap(colored, colored, COLORMAP_JET);
         if (idx >= 64) {
           putTempText(colored, temp);
+          imshow("Thermography", colored);
         }
-        imshow("Thermography", colored);
         char c = (char)waitKey(25);
         if (c == 'q') {
           close(fd);
