@@ -36,7 +36,6 @@ void i2c_write(uint8_t dev_addr, uint8_t *data, uint8_t len) {
     Wire.write(data[i]);
   }
   Wire.endTransmission(true);
-  delay(100);  // TODO: polling
 }
 
 /*---- Utility functions ---------------------------*/
