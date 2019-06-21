@@ -10,9 +10,11 @@ https://github.com/xanthium-enterprises/Serial-Port-Programming-on-Linux/blob/ma
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
 
-// Port connected to Arduino
-#define PORT "/dev/serial/by-id/usb-Arduino_Srl_Arduino_Uno_8543533323135181C251-if00"
-//#define PORT "/dev/ttyACM0"
+/*
+ * Port connected to Arduino
+ */
+//#define PORT "/dev/serial/by-id/usb-Arduino_Srl_Arduino_Uno_8543533323135181C251-if00"
+#define PORT "/dev/ttyACM0"
 
 // Frame delimiter (assuming that the temperature is smaller that 0xFE)
 #define BEGIN 0xFE
@@ -55,7 +57,7 @@ int main(int argc, char* argv[]) {
   // Serial port settings
   tcgetattr(fd, &settings);
 
-  cfsetispeed(&settings,B115200);
+  cfsetospeed(&settings,B115200);
 
   settings.c_cflag &= ~PARENB;
   settings.c_cflag &= ~CSTOPB;
@@ -67,6 +69,7 @@ int main(int argc, char* argv[]) {
   settings.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG);
   settings.c_oflag &= ~OPOST;
 
+  // Blocking mode
   settings.c_cc[VMIN] = 1;
   settings.c_cc[VTIME] = 0;
 
@@ -115,6 +118,7 @@ int main(int argc, char* argv[]) {
             cout << temp[i] << ',';
           }
           cout << temp[63] << endl;
+          close(fd);
           exit(0);
         }
       } else {
