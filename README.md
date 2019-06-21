@@ -49,7 +49,6 @@ Note: "thermo" command must be excuted with superuser priviledge for the first t
 
 ## Next features to be developed
 
-- Color bar to show temperature
 - Bicubic interpolation
 - Pattern matching to recognize hand gesture etc
 
