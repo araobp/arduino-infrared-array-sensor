@@ -40,7 +40,7 @@ This is me!
 ```
 $ cd raspi
 $ make
-$ bin/thermo
+$ bin/thermo -t
 ```
 
 GUI developed in a native language (c/c++) runs fast on RasPi 3!
