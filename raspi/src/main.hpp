@@ -1,1 +1,1 @@
-#define MAGNIFY 64
+#define MAGNIFY 64 
