@@ -47,6 +47,8 @@ GUI developed in a native language (c/c++) runs fast on RasPi 3!
 
 ### Bicubic interpolation
 
+The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to the original 8x8 pixel image for higher resolution.
+
 <img src="./doc/bicubic_interpolation.png" width=200>
 
 ```
