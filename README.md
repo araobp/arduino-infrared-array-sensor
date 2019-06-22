@@ -2,8 +2,6 @@
 
 <img src="doc/shield.jpg" width=300>
 
-(Work in progress)
-
 AMG8833 is an infrared array sensor product from Panasonic. It is very popular among Arduino users.
 
 ## Development environment
