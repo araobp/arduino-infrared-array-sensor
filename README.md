@@ -17,7 +17,11 @@ Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasP
 ```
     [GUI/RasPi3]/dev/ttyACM0----VCP/USB----[Arduino]----I2C----[AMG8833]
 ```
+## Data frame format (raster-scan 8x8 pixel image) over VCP/USB
 
+```
+   [BEGIN(0xFE)][byte#0]...[byte#63][END(0xFF)]
+```
 ## Arduino shield of AMG8833
 
 ==>[schematic](./kicad)
