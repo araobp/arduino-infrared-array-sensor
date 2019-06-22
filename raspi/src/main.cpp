@@ -12,6 +12,42 @@
 using namespace std;
 using namespace cv;
 
+// Command line options
+struct {
+  bool withTemp;
+} commandArgs;
+
+const char optString[] = "t";
+
+// Display command usage
+void displayUsage(void) {
+  cout << "Usage: thermo [OPTION...]" << endl;
+  cout << "" << endl;
+  cout << "-t               show thermography with temperature overlaied" << endl;
+  cout << "-?               show this help" << endl;
+}
+
+// Command argument parser based on unistd.h
+void argparse(int argc, char * argv[]) {
+
+  commandArgs.withTemp = false;
+
+  int opt;
+  opterr = 0;  // disable getopt() error message output
+
+  while ((opt = getopt(argc, argv, optString)) != -1) {
+    switch(opt){
+      case 't':
+        commandArgs.withTemp = true;
+        break;
+      default:
+        displayUsage();
+        exit(1);
+        break;
+    }
+  }
+}
+
 /*
  * Enlarge image: 32 times larger that the origial
  */
@@ -66,6 +102,8 @@ int main(int argc, char* argv[]) {
   Mat colored;
   vector<string> temp;
 
+  argparse(argc, argv);
+
   while (true) {
     bytes_read = read(fd, &buf, 1);
     for (int i = 0; i < bytes_read; i++) {
@@ -86,7 +124,9 @@ int main(int argc, char* argv[]) {
         enlarged.convertTo(colored, CV_8UC3);
         applyColorMap(colored, colored, COLORMAP_JET);
         if (idx >= 64) {
-          putTempText(colored, temp);
+          if (commandArgs.withTemp) {
+            putTempText(colored, temp);
+          }
           imshow("Thermography", colored);
         }
         char c = (char)waitKey(25);
