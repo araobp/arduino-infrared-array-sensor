@@ -40,14 +40,18 @@ This is me!
 ```
 $ cd raspi
 $ make
-$ bin/thermo -t
+$ bin/thermo -m 64 -t -b
 ```
 
 GUI developed in a native language (c/c++) runs fast on RasPi 3!
 
 ### Bicubic interpolation
 
-<img src="./doc/bicubic_interpolation" width=200>
+<img src="./doc/bicubic_interpolation.png" width=200>
+
+```
+$ bin/thermo -m 4 -i
+```
 
 ## Next features to be developed
 
