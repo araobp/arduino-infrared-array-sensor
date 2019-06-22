@@ -18,9 +18,10 @@ struct {
   int magnification;
   int applyInterpolation;
   bool applyBinalization;
+  bool applyColorMapHot;
 } args;
 
-const char optString[] = "tbm:iB";
+const char optString[] = "tbm:iBH";
 
 // Display command usage
 void displayUsage(void) {
@@ -33,6 +34,7 @@ void displayUsage(void) {
   cout << "-i               apply bicubic interpolation" << endl;
   cout << "-b               apply blur effect" << endl;
   cout << "-B               apply binalization" << endl;
+  cout << "-H               apply COLORMAP_HOT" << endl;
   cout << "-?               show this help" << endl;
 }
 
@@ -44,6 +46,7 @@ void argparse(int argc, char * argv[]) {
   args.magnification = 32;
   args.applyInterpolation = false;
   args.applyBinalization = false;
+  args.applyColorMapHot = false;
 
   int opt;
   opterr = 0;  // disable getopt() error message output
@@ -64,6 +67,9 @@ void argparse(int argc, char * argv[]) {
         break;
       case 'B':
         args.applyBinalization = true;
+        break;
+      case 'H':
+        args.applyColorMapHot = true;
         break;
       default:
         displayUsage();
@@ -169,7 +175,11 @@ int main(int argc, char* argv[]) {
           blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
         }
         enlarged.convertTo(colored, CV_8UC3);
-        applyColorMap(colored, colored, COLORMAP_JET);
+        if (args.applyColorMapHot) {
+          applyColorMap(colored, colored, COLORMAP_HOT);
+        } else {
+          applyColorMap(colored, colored, COLORMAP_JET);
+        }
         if (idx >= 64) {
           if (!args.applyInterpolation && args.withTemp) {
             putTempText(colored, args.magnification, temp);
