@@ -57,7 +57,8 @@ The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to
 $ bin/thermo -m 4 -i
 ```
 
-## Next features to be developed
+### Hand gesture classification
 
-- Pattern matching to recognize hand gesture etc
+I have already experimented on deep learning such as CNN or DCT(for image pre-processing) + DNN in [this project](https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-F401RE/AI) for hand gesture classification. It took a lot of time and efforts to train the neural network.
 
+This time I will try a classical method on OpenCV: image binalization and pattern matching.
