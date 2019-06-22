@@ -14,12 +14,13 @@ using namespace cv;
 // Command line options
 struct {
   bool withTemp;
-  bool enableBlur;
+  bool applyBlur;
   int magnification;
-  int enableInterpolation;
+  int applyInterpolation;
+  bool applyBinalization;
 } args;
 
-const char optString[] = "tbm:i";
+const char optString[] = "tbm:iB";
 
 // Display command usage
 void displayUsage(void) {
@@ -29,8 +30,9 @@ void displayUsage(void) {
   cout << "-m magnification magnify image" << endl;
   cout << "                 ..without interpolation: (8 x m)^2 pixels" << endl;
   cout << "                 ..with interpolation: (4 x 4^m)^2 pixels" << endl;
-  cout << "-i               enable bicubic interpolation" << endl;
-  cout << "-b               enable blur effect" << endl;
+  cout << "-i               apply bicubic interpolation" << endl;
+  cout << "-b               apply blur effect" << endl;
+  cout << "-B               apply binalization" << endl;
   cout << "-?               show this help" << endl;
 }
 
@@ -38,9 +40,10 @@ void displayUsage(void) {
 void argparse(int argc, char * argv[]) {
 
   args.withTemp = false;
-  args.enableBlur = false;
+  args.applyBlur = false;
   args.magnification = 32;
-  args.enableInterpolation = false;
+  args.applyInterpolation = false;
+  args.applyBinalization = false;
 
   int opt;
   opterr = 0;  // disable getopt() error message output
@@ -51,13 +54,16 @@ void argparse(int argc, char * argv[]) {
         args.withTemp = true;
         break;
       case 'b':
-        args.enableBlur = true;
+        args.applyBlur = true;
         break;
       case 'm':
         args.magnification = atoi(optarg);
         break;
       case 'i':
-        args.enableInterpolation = true;
+        args.applyInterpolation = true;
+        break;
+      case 'B':
+        args.applyBinalization = true;
         break;
       default:
         displayUsage();
@@ -66,7 +72,7 @@ void argparse(int argc, char * argv[]) {
     }
   }
 
-  if (args.enableInterpolation && (args.magnification > 4)) {
+  if (args.applyInterpolation && (args.magnification > 4)) {
     cout << "magnification must not be larger than 4 for interpolation!" << endl;
     exit(-1);
   }
@@ -134,7 +140,7 @@ int main(int argc, char* argv[]) {
 
   Mat img(8, 8, CV_8U, frameBuf);
   Mat enlarged;
-  if (!args.enableInterpolation) { 
+  if (!args.applyInterpolation) { 
     enlarged = Mat(Size(8*args.magnification, 8*args.magnification), CV_8U);
   }
   Mat colored;
@@ -155,14 +161,17 @@ int main(int argc, char* argv[]) {
         temp.clear();
       } else if (buf[i] == END){
         normalize(img, img , 0, 255, NORM_MINMAX);
-        enlarge(img, enlarged, args.magnification, args.enableInterpolation);
-        if (args.enableBlur) {
+        enlarge(img, enlarged, args.magnification, args.applyInterpolation);
+        if (args.applyBinalization) {
+          threshold(enlarged, enlarged, 130, 255, THRESH_BINARY);
+        }
+        if (args.applyBlur) {
           blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
         }
         enlarged.convertTo(colored, CV_8UC3);
         applyColorMap(colored, colored, COLORMAP_JET);
         if (idx >= 64) {
-          if (!args.enableInterpolation && args.withTemp) {
+          if (!args.applyInterpolation && args.withTemp) {
             putTempText(colored, args.magnification, temp);
           }
           imshow("Thermography", colored);
