@@ -57,6 +57,8 @@ The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to
 $ bin/thermo -m 4 -i
 ```
 
+This is my right hand.
+
 ### Binalization
 
 <img src="./doc/binalization.png" width=200>
