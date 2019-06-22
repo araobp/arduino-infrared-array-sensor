@@ -45,8 +45,11 @@ $ bin/thermo -t
 
 GUI developed in a native language (c/c++) runs fast on RasPi 3!
 
+### Bicubic interpolation
+
+<img src="./doc/bicubic_interpolation" width=200>
+
 ## Next features to be developed
 
-- Bicubic interpolation
 - Pattern matching to recognize hand gesture etc
 
