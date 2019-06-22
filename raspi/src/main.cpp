@@ -2,7 +2,6 @@
 #include <opencv2/opencv.hpp>
 #include <fcntl.h>
 #include <unistd.h>
-#include "main.hpp"
 #include "serialport.hpp"
 
 // Frame delimiter (assuming that the temperature is smaller that 0xFE)
@@ -16,27 +15,32 @@ using namespace cv;
 struct {
   bool withTemp;
   bool enableBlur;
-  int magnify;
-} commandArgs;
+  int magnification;
+  int enableInterpolation;
+} args;
 
-const char optString[] = "tbs:";
+const char optString[] = "tbm:i";
 
 // Display command usage
 void displayUsage(void) {
   cout << "Usage: thermo [OPTION...]" << endl;
   cout << "" << endl;
   cout << "-t               show thermography with temperature overlaied" << endl;
+  cout << "-m magnification magnify image" << endl;
+  cout << "                 ..without interpolation: (8 x m)^2 pixels" << endl;
+  cout << "                 ..with interpolation: (4 x 4^m)^2 pixels" << endl;
+  cout << "-i               enable bicubic interpolation" << endl;
   cout << "-b               enable blur effect" << endl;
-  cout << "-s magnify       size ((8 x n)^2 pixels)" << endl;
   cout << "-?               show this help" << endl;
 }
 
 // Command argument parser based on unistd.h
 void argparse(int argc, char * argv[]) {
 
-  commandArgs.withTemp = false;
-  commandArgs.withTemp = false;
-  commandArgs.magnify = MAGNIFY;
+  args.withTemp = false;
+  args.enableBlur = false;
+  args.magnification = 32;
+  args.enableInterpolation = false;
 
   int opt;
   opterr = 0;  // disable getopt() error message output
@@ -44,13 +48,16 @@ void argparse(int argc, char * argv[]) {
   while ((opt = getopt(argc, argv, optString)) != -1) {
     switch(opt){
       case 't':
-        commandArgs.withTemp = true;
+        args.withTemp = true;
         break;
       case 'b':
-        commandArgs.enableBlur = true;
+        args.enableBlur = true;
         break;
-      case 's':
-        commandArgs.magnify = atoi(optarg);
+      case 'm':
+        args.magnification = atoi(optarg);
+        break;
+      case 'i':
+        args.enableInterpolation = true;
         break;
       default:
         displayUsage();
@@ -58,21 +65,35 @@ void argparse(int argc, char * argv[]) {
         break;
     }
   }
+
+  if (args.enableInterpolation && (args.magnification > 4)) {
+    cout << "magnification must not be larger than 4 for interpolation!" << endl;
+    exit(-1);
+  }
 }
 
 /*
- * Enlarge image: 32 times larger that the origial
+ * Enlarge image
  */
-void enlarge(Mat &src, Mat &dst) {
+void enlarge(Mat &src, Mat &dst, int magnification, bool interpolation=false) {
   uint8_t pixel;
-  for (int y = 0; y < 8; y++) {
-    for (int x = 0; x < 8; x++) {
-      pixel = src.at<uint8_t>(y,x);
-      for (int yy = 0; yy < commandArgs.magnify; yy++) {
-        for (int xx = 0; xx < commandArgs.magnify; xx++) {
-          dst.at<uint8_t>(y*commandArgs.magnify+yy, x*commandArgs.magnify+xx) = pixel;
+  int size;
+  if (!interpolation) {
+    for (int y = 0; y < 8; y++) {
+      for (int x = 0; x < 8; x++) {
+        pixel = src.at<uint8_t>(y,x);
+        for (int yy = 0; yy < magnification; yy++) {
+          for (int xx = 0; xx < magnification; xx++) {
+            dst.at<uint8_t>(y*magnification+yy, x*args.magnification+xx) = pixel;
+          }
         }
       }
+    }
+  } else {
+    resize(src, dst, Size(8*4, 8*4), 0, 0, INTER_CUBIC);
+    for (int i = 2.0; i <= (float)magnification; i += 1.0) {
+      size = (int)pow(4.0, i);
+      resize(dst, dst, Size(size, size), 0, 0, INTER_CUBIC);
     }
   }
 }
@@ -80,20 +101,20 @@ void enlarge(Mat &src, Mat &dst) {
 /*
  * Super-impose temperature data on the image
  */
-void putTempText(Mat &src, vector<string> &temp) {
+void putTempText(Mat &src, int magnification, vector<string> &temp) {
 
   int font = FONT_HERSHEY_SIMPLEX;
-  int x_offset = 12*commandArgs.magnify/64;
-  int y_offset = commandArgs.magnify - 22*commandArgs.magnify/64;
+  int x_offset = 12*magnification/64;
+  int y_offset = magnification - 22*magnification/64;
   int xx, yy;
   int i = 0;
 
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
-      xx = x_offset + x * commandArgs.magnify;
-      yy = y_offset + y * commandArgs.magnify;
+      xx = x_offset + x * magnification;
+      yy = y_offset + y * magnification;
       string &t = temp.at(i);
-      putText(src, t, Point(xx, yy), font, (float)commandArgs.magnify/64.0, Scalar(255,255,255), 2, LINE_AA);
+      putText(src, t, Point(xx, yy), font, (float)magnification/64.0, Scalar(255,255,255), 1+magnification/64, LINE_AA);
       i++;
     }
   }
@@ -112,7 +133,10 @@ int main(int argc, char* argv[]) {
   int idx = 0;
 
   Mat img(8, 8, CV_8U, frameBuf);
-  Mat enlarged(Size(8*commandArgs.magnify, 8*commandArgs.magnify), CV_8U);
+  Mat enlarged;
+  if (!args.enableInterpolation) { 
+    enlarged = Mat(Size(8*args.magnification, 8*args.magnification), CV_8U);
+  }
   Mat colored;
   vector<string> temp;
 
@@ -131,15 +155,15 @@ int main(int argc, char* argv[]) {
         temp.clear();
       } else if (buf[i] == END){
         normalize(img, img , 0, 255, NORM_MINMAX);
-        enlarge(img, enlarged);
-        if (commandArgs.enableBlur) {
+        enlarge(img, enlarged, args.magnification, args.enableInterpolation);
+        if (args.enableBlur) {
           blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
         }
         enlarged.convertTo(colored, CV_8UC3);
         applyColorMap(colored, colored, COLORMAP_JET);
         if (idx >= 64) {
-          if (commandArgs.withTemp) {
-            putTempText(colored, temp);
+          if (!args.enableInterpolation && args.withTemp) {
+            putTempText(colored, args.magnification, temp);
           }
           imshow("Thermography", colored);
         }
@@ -149,7 +173,7 @@ int main(int argc, char* argv[]) {
           exit(0);
         }
       } else {
-        frameBuf[idx++] = buf[i];
+        frameBuf[idx++] = (uint8_t)buf[i];
         temp.push_back(to_string((buf[i]+2)/4));  // in Celsius (x 0.25)
       }
 #endif

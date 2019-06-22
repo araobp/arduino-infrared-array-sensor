@@ -1,1 +1,0 @@
-#define MAGNIFY 64 
