@@ -57,6 +57,14 @@ The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to
 $ bin/thermo -m 4 -i
 ```
 
+### Binalization
+
+<img src="./doc/binalization.png" width=200>
+
+```
+$ bin/thermo -m 4 -i -B
+```
+
 ### Hand gesture classification
 
 I have already experimented on deep learning such as CNN or DCT(for image pre-processing) + DNN in [this project](https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-F401RE/AI) for hand gesture classification. It took a lot of time and efforts to train the neural network.
