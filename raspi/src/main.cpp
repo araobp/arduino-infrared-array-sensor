@@ -3,10 +3,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "serialport.hpp"
+#include "cv_ext.hpp"
 
 // Frame delimiter (assuming that the temperature is smaller that 0xFE)
 #define BEGIN 0xFE
 #define END 0xFF
+
+#define BIN_THRES 130U
 
 using namespace std;
 using namespace cv;
@@ -84,58 +87,12 @@ void argparse(int argc, char * argv[]) {
   }
 }
 
-/*
- * Enlarge image
- */
-void enlarge(Mat &src, Mat &dst, int magnification, bool interpolation=false) {
-  uint8_t pixel;
-  int size;
-  if (!interpolation) {
-    for (int y = 0; y < 8; y++) {
-      for (int x = 0; x < 8; x++) {
-        pixel = src.at<uint8_t>(y,x);
-        for (int yy = 0; yy < magnification; yy++) {
-          for (int xx = 0; xx < magnification; xx++) {
-            dst.at<uint8_t>(y*magnification+yy, x*args.magnification+xx) = pixel;
-          }
-        }
-      }
-    }
-  } else {
-    resize(src, dst, Size(8*4, 8*4), 0, 0, INTER_CUBIC);
-    for (int i = 2.0; i <= (float)magnification; i += 1.0) {
-      size = (int)pow(4.0, i);
-      resize(dst, dst, Size(size, size), 0, 0, INTER_CUBIC);
-    }
-  }
-}
-
-/*
- * Super-impose temperature data on the image
- */
-void putTempText(Mat &src, int magnification, vector<string> &temp) {
-
-  int font = FONT_HERSHEY_SIMPLEX;
-  int x_offset = 12*magnification/64;
-  int y_offset = magnification - 22*magnification/64;
-  int xx, yy;
-  int i = 0;
-
-  for (int y = 0; y < 8; y++) {
-    for (int x = 0; x < 8; x++) {
-      xx = x_offset + x * magnification;
-      yy = y_offset + y * magnification;
-      string &t = temp.at(i);
-      putText(src, t, Point(xx, yy), font, (float)magnification/64.0, Scalar(255,255,255), 1+magnification/64, LINE_AA);
-      i++;
-    }
-  }
-}
-
 int main(int argc, char* argv[]) {
 
+  // Parse command line arguments
   argparse(argc, argv);
 
+  // Open serial port to get file descriptor
   int fd = openSerialPort();
 
   // Image processing
@@ -145,9 +102,9 @@ int main(int argc, char* argv[]) {
   int idx = 0;
 
   Mat img(8, 8, CV_8U, frameBuf);
-  Mat enlarged;
+  Mat magnified;
   if (!args.applyInterpolation) { 
-    enlarged = Mat(Size(8*args.magnification, 8*args.magnification), CV_8U);
+    magnified = Mat(Size(8*args.magnification, 8*args.magnification), CV_8U);
   }
   Mat colored;
   vector<string> temp;
@@ -167,14 +124,14 @@ int main(int argc, char* argv[]) {
         temp.clear();
       } else if (buf[i] == END){
         normalize(img, img , 0, 255, NORM_MINMAX);
-        enlarge(img, enlarged, args.magnification, args.applyInterpolation);
+        magnify(img, magnified, args.magnification, args.applyInterpolation);
         if (args.applyBinalization) {
-          threshold(enlarged, enlarged, 130, 255, THRESH_BINARY);
+          threshold(magnified, magnified, BIN_THRES, 255, THRESH_BINARY);
         }
         if (args.applyBlur) {
-          blur(enlarged, enlarged, Size(11,11), Point(-1,-1));
+          blur(magnified, magnified, Size(11,11), Point(-1,-1));
         }
-        enlarged.convertTo(colored, CV_8UC3);
+        magnified.convertTo(colored, CV_8UC3);
         if (args.applyColorMapHot) {
           applyColorMap(colored, colored, COLORMAP_HOT);
         } else {
