@@ -56,7 +56,7 @@ The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to
 This is my right hand.
 
 ```
-$ bin/thermo -m 4 -i
+$ bin/thermo -m 1 -i 3
 ```
 
 ### Binalization
@@ -64,7 +64,7 @@ $ bin/thermo -m 4 -i
 <img src="./doc/binalization.png" width=200>
 
 ```
-$ bin/thermo -m 4 -i -B
+$ bin/thermo -m 1 -i 3 -B
 ```
 
 ### Hand gesture classification

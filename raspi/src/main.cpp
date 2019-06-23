@@ -44,7 +44,7 @@ void argparse(int argc, char * argv[]) {
 
   args.withTemp = false;
   args.applyBlur = false;
-  args.magnification = 32;
+  args.magnification = 16;
   args.repeat = 0;
   args.applyBinalization = false;
   args.applyColorMapHot = false;
