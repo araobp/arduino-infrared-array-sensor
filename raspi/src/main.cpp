@@ -19,26 +19,24 @@ struct {
   bool withTemp;
   bool applyBlur;
   int magnification;
-  int applyInterpolation;
+  int repeat;
   bool applyBinalization;
   bool applyColorMapHot;
 } args;
 
-const char optString[] = "tbm:iBH";
+const char optString[] = "tbm:i:BH";
 
 // Display command usage
 void displayUsage(void) {
   cout << "Usage: thermo [OPTION...]" << endl;
   cout << "" << endl;
-  cout << "-t               show thermography with temperature overlaied" << endl;
-  cout << "-m magnification magnify image" << endl;
-  cout << "                 ..without interpolation: (8 x m)^2 pixels" << endl;
-  cout << "                 ..with interpolation: (8 x 4^m)^2 pixels" << endl;
-  cout << "-i               apply bicubic interpolation" << endl;
-  cout << "-b               apply blur effect" << endl;
-  cout << "-B               apply binalization" << endl;
-  cout << "-H               apply COLORMAP_HOT" << endl;
-  cout << "-?               show this help" << endl;
+  cout << "  -t                 show thermography with temperature overlaied" << endl;
+  cout << "  -m magnification   magnify image" << endl;
+  cout << "  -i repeat          apply bicubic interpolation (4^repeat magnified)" << endl;
+  cout << "  -b                 apply blur effect" << endl;
+  cout << "  -B                 apply binalization" << endl;
+  cout << "  -H                 apply COLORMAP_HOT" << endl;
+  cout << "  -?                 show this help" << endl;
 }
 
 // Command argument parser based on unistd.h
@@ -47,7 +45,7 @@ void argparse(int argc, char * argv[]) {
   args.withTemp = false;
   args.applyBlur = false;
   args.magnification = 32;
-  args.applyInterpolation = false;
+  args.repeat = 0;
   args.applyBinalization = false;
   args.applyColorMapHot = false;
 
@@ -66,7 +64,7 @@ void argparse(int argc, char * argv[]) {
         args.magnification = atoi(optarg);
         break;
       case 'i':
-        args.applyInterpolation = true;
+        args.repeat = atoi(optarg);
         break;
       case 'B':
         args.applyBinalization = true;
@@ -79,11 +77,6 @@ void argparse(int argc, char * argv[]) {
         exit(1);
         break;
     }
-  }
-
-  if (args.applyInterpolation && (args.magnification > 4)) {
-    cout << "magnification must not be larger than 4 for interpolation!" << endl;
-    exit(-1);
   }
 }
 
@@ -102,10 +95,8 @@ int main(int argc, char* argv[]) {
   int idx = 0;
 
   Mat img(8, 8, CV_8U, frameBuf);
-  Mat magnified;
-  if (!args.applyInterpolation) { 
-    magnified = Mat(Size(8*args.magnification, 8*args.magnification), CV_8U);
-  }
+  Mat interpolated;
+  Mat magnified = Mat(Size(8*args.magnification*(int)pow(4.0,(float)args.repeat), 8*args.magnification*(int)pow(4.0,(float)args.repeat)), CV_8U);
   Mat colored;
   vector<string> temp;
 
@@ -124,7 +115,12 @@ int main(int argc, char* argv[]) {
         temp.clear();
       } else if (buf[i] == END){
         normalize(img, img , 0, 255, NORM_MINMAX);
-        magnify(img, magnified, args.magnification, args.applyInterpolation);
+        if (args.repeat > 0) {
+          interpolate(img, interpolated, args.repeat);
+          magnify(interpolated, magnified, args.magnification);
+        } else {
+          magnify(img, magnified, args.magnification);
+        }
         if (args.applyBinalization) {
           threshold(magnified, magnified, BIN_THRES, 255, THRESH_BINARY);
         }
@@ -138,7 +134,7 @@ int main(int argc, char* argv[]) {
           applyColorMap(colored, colored, COLORMAP_JET);
         }
         if (idx >= 64) {
-          if (!args.applyInterpolation && args.withTemp) {
+          if (!args.repeat && args.withTemp) {
             putTempText(colored, args.magnification, temp);
           }
           imshow("Thermography", colored);
