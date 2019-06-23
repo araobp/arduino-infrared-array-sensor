@@ -33,7 +33,7 @@ void displayUsage(void) {
   cout << "-t               show thermography with temperature overlaied" << endl;
   cout << "-m magnification magnify image" << endl;
   cout << "                 ..without interpolation: (8 x m)^2 pixels" << endl;
-  cout << "                 ..with interpolation: (4 x 4^m)^2 pixels" << endl;
+  cout << "                 ..with interpolation: (8 x 4^m)^2 pixels" << endl;
   cout << "-i               apply bicubic interpolation" << endl;
   cout << "-b               apply blur effect" << endl;
   cout << "-B               apply binalization" << endl;
