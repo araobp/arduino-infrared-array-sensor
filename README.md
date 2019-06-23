@@ -59,6 +59,14 @@ This is my right hand.
 $ bin/thermo -m 1 -i 3
 ```
 
+The image above uses COLORMAP_JET. With "-H" option, the command uses COLORMAP_HOT instead.
+
+<img src="./doc/hot.png" width=200>
+
+```
+$ bin/thermo -m 3 -i 2 -H -b
+```
+
 ### Binalization
 
 <img src="./doc/binalization.png" width=200>
