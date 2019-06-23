@@ -45,7 +45,7 @@ $ make
 $ bin/thermo -m 64 -t -b
 ```
 
-GUI developed in a native language (c/c++) runs fast on RasPi 3!
+GUI developed in a native language (C/C++) runs fast on RasPi 3!
 
 ### Bicubic interpolation
 
