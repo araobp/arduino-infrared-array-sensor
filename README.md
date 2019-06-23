@@ -64,7 +64,7 @@ $ bin/thermo -m 1 -i 3
 <img src="./doc/binalization.png" width=200>
 
 ```
-$ bin/thermo -m 1 -i 3 -B
+$ bin/thermo -m 1 -i 3 -H -B
 ```
 
 ### Hand gesture classification
