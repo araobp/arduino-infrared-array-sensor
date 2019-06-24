@@ -74,5 +74,5 @@ The GUI supports binalization:
 <img src="./doc/binalization.png" width=200>
 
 ```
-$ bin/thermo -m 1 -i 3 -H -B
+$ bin/thermo -m 32 -H -B
 ```
