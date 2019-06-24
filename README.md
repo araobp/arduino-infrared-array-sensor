@@ -76,3 +76,13 @@ The GUI supports binalization:
 ```
 $ bin/thermo -m 32 -H -B
 ```
+
+### Diff between frames: gradiente(=velocity)
+
+The GUI supports image diff between frames:
+
+<img src="./doc/diff.png" width=200>
+
+```
+$ bin/thermo -m 32 -d
+```
