@@ -1,8 +1,11 @@
 #include "cv_ext.hpp"
 
-
 /*
  * Interpolate image
+ *
+ * The reason why I use this function instead of cv::resize() is that
+ * the original image (8x8) is too small for bicubic interpolation.
+ * I found that repeating bicubic interpolation works well.
  */
 void interpolate(Mat &src, Mat &dst, int repeat) {
   resize(src, dst, Size(src.cols*4, src.rows*4), 0, 0, INTER_CUBIC);
@@ -13,6 +16,10 @@ void interpolate(Mat &src, Mat &dst, int repeat) {
 
 /*
  * Magnify image
+ *
+ * The reason why I use this function instead of cv::resize() is that
+ * it is impossible to disable interpolation on cv::resize().
+ * This function just supports magnification without interpolation.
  */
 void magnify(Mat &src, Mat &dst, int magnification) {
   uint8_t pixel;
@@ -29,9 +36,9 @@ void magnify(Mat &src, Mat &dst, int magnification) {
 }
 
 /*
- *  * Super-impose temperature data on the image
- *   */
-void putTempText(Mat &src, int magnification, vector<string> &temp, bool colorBlack) {
+ *  Super-impose temperature data on the image
+ */
+void putTempText(Mat &src, int magnification, vector<string> &temp, bool colorBlack, bool negative) {
 
   int font = FONT_HERSHEY_SIMPLEX;
   int x_offset = 12*magnification/64;
@@ -39,19 +46,26 @@ void putTempText(Mat &src, int magnification, vector<string> &temp, bool colorBl
   int xx, yy;
   int i = 0;
   int color = 255;
+  float fontSize;
 
   if (colorBlack) {
   color = 0;
   }
 
+  if (negative) {
+    fontSize = (float)magnification/96.0;
+  } else {
+    fontSize = (float)magnification/64.0;
+  }
+
   for (int y = 0; y < 8; y++) {
-      for (int x = 0; x < 8; x++) {
-            xx = x_offset + x * magnification;
-            yy = y_offset + y * magnification;
-            string &t = temp.at(i);
-            putText(src, t, Point(xx, yy), font, (float)magnification/64.0, Scalar(color,color,color), 1+magnification/64, LINE_AA);
-            i++;
-          }
+    for (int x = 0; x < 8; x++) {
+      xx = x_offset + x * magnification;
+      yy = y_offset + y * magnification;
+      string &t = temp.at(i);
+      putText(src, t, Point(xx, yy), font, fontSize, Scalar(color,color,color), 1+magnification/64, LINE_AA);
+      i++;
     }
+  }
 }
 

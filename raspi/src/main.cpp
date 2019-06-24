@@ -10,6 +10,7 @@
 #define END 0xFF
 
 #define BIN_THRES 130U
+#define DIFF_MAGNIFICATION 5
 
 using namespace std;
 using namespace cv;
@@ -17,37 +18,40 @@ using namespace cv;
 // Command line options
 struct {
   bool withTemp;
-  bool applyBlur;
+  bool enableBlur;
   int magnification;
-  int repeat;
-  bool applyBinalization;
-  bool applyColorMapHot;
+  int repeatInterpolation;
+  bool enableBinalization;
+  bool enableColorMapHot;
+  bool enableDiff;
 } args;
 
-const char optString[] = "tbm:i:BH";
+const char optString[] = "tbm:i:BHd";
 
 // Display command usage
 void displayUsage(void) {
   cout << "Usage: thermo [OPTION...]" << endl;
   cout << "" << endl;
-  cout << "  -t                 show thermography with temperature overlaied" << endl;
-  cout << "  -m magnification   magnify image" << endl;
-  cout << "  -i repeat          apply bicubic interpolation (4^repeat magnified)" << endl;
-  cout << "  -b                 apply blur effect" << endl;
-  cout << "  -B                 apply binalization" << endl;
-  cout << "  -H                 apply COLORMAP_HOT" << endl;
-  cout << "  -?                 show this help" << endl;
+  cout << "   -t                   show thermography with temperature overlaied" << endl;
+  cout << "   -m magnificatio      magnify image" << endl;
+  cout << "   -i repeat            repeat interpolation (4^repeat magnified)" << endl;
+  cout << "   -b                   enable blur effect" << endl;
+  cout << "   -d                   enable diff between frames" << endl;
+  cout << "   -B                   enable binalization" << endl;
+  cout << "   -H                   enable COLORMAP_HOT" << endl;
+  cout << "   -?                   show this help" << endl;
 }
 
 // Command argument parser based on unistd.h
 void argparse(int argc, char * argv[]) {
 
   args.withTemp = false;
-  args.applyBlur = false;
+  args.enableBlur = false;
   args.magnification = 16;
-  args.repeat = 0;
-  args.applyBinalization = false;
-  args.applyColorMapHot = false;
+  args.repeatInterpolation = 0;
+  args.enableBinalization = false;
+  args.enableColorMapHot = false;
+  args.enableDiff = false;
 
   int opt;
   opterr = 0;  // disable getopt() error message output
@@ -58,19 +62,22 @@ void argparse(int argc, char * argv[]) {
         args.withTemp = true;
         break;
       case 'b':
-        args.applyBlur = true;
+        args.enableBlur = true;
         break;
       case 'm':
         args.magnification = atoi(optarg);
         break;
       case 'i':
-        args.repeat = atoi(optarg);
+        args.repeatInterpolation = atoi(optarg);
         break;
       case 'B':
-        args.applyBinalization = true;
+        args.enableBinalization = true;
         break;
       case 'H':
-        args.applyColorMapHot = true;
+        args.enableColorMapHot = true;
+        break;
+      case 'd':
+        args.enableDiff = true;
         break;
       default:
         displayUsage();
@@ -92,11 +99,13 @@ int main(int argc, char* argv[]) {
   char buf[1];
   int bytes_read = 0;
   uint8_t frameBuf[64];
+  int prevFrame[64];
+  int diff;
   int idx = 0;
 
   Mat img(8, 8, CV_8U, frameBuf);
   Mat interpolated;
-  Mat magnified = Mat(Size(8*args.magnification*(int)pow(4.0,(float)args.repeat), 8*args.magnification*(int)pow(4.0,(float)args.repeat)), CV_8U);
+  Mat magnified = Mat(Size(8*args.magnification*(int)pow(4.0,(float)args.repeatInterpolation), 8*args.magnification*(int)pow(4.0,(float)args.repeatInterpolation)), CV_8U);
   Mat colored;
   vector<string> temp;
   Mat labels;
@@ -105,23 +114,18 @@ int main(int argc, char* argv[]) {
   while (true) {
     bytes_read = read(fd, &buf, 1);
     for (int i = 0; i < bytes_read; i++) {
-#ifdef CHAR_FORMAT
-      if (buf[i] == ',') {
-        cout << endl;
-      } else {
-        cout << buf[i];
-      }
-#else
       if (buf[i] == BEGIN) {
         idx = 0;
         temp.clear();
       } else if (buf[i] == END){
-        normalize(img, img , 0, 255, NORM_MINMAX);
-        if (args.repeat > 0) {
-          interpolate(img, interpolated, args.repeat);
+        if (!args.enableDiff) {
+          normalize(img, img , 0, 255, NORM_MINMAX);
+        }
+        if (args.repeatInterpolation > 0) {
+          interpolate(img, interpolated, args.repeatInterpolation);
           magnify(interpolated, magnified, args.magnification);
         } else {
-          if (args.applyBinalization) {
+          if (args.enableBinalization) {
             threshold(img, img, BIN_THRES, 255, THRESH_BINARY);
             connectedComponents(img, labels, 8, CV_16U);
             labelsStr.clear();
@@ -133,21 +137,23 @@ int main(int argc, char* argv[]) {
           }
           magnify(img, magnified, args.magnification);
         }
-        if (args.applyBlur) {
+        if (args.enableBlur) {
           blur(magnified, magnified, Size(11,11), Point(-1,-1));
         }
         magnified.convertTo(colored, CV_8UC3);
-        if (args.applyColorMapHot) {
+        if (args.enableColorMapHot) {
           applyColorMap(colored, colored, COLORMAP_HOT);
         } else {
           applyColorMap(colored, colored, COLORMAP_JET);
         }
         if (idx >= 64) {
-          if (!args.repeat) {
-            if (args.withTemp) {
-              putTempText(colored, args.magnification, temp, args.applyColorMapHot);
-            } else if (args.applyBinalization) {
-              putTempText(colored, args.magnification, labelsStr, args.applyColorMapHot);
+          if (!args.repeatInterpolation) {
+            if (args.enableDiff) {
+              putTempText(colored, args.magnification, temp, args.enableColorMapHot, true);
+            } else if (args.withTemp) {
+              putTempText(colored, args.magnification, temp, args.enableColorMapHot);
+            } else if (args.enableBinalization) {
+              putTempText(colored, args.magnification, labelsStr, args.enableColorMapHot);
             }
           }
           imshow("Thermography", colored);
@@ -158,10 +164,16 @@ int main(int argc, char* argv[]) {
           exit(0);
         }
       } else {
-        frameBuf[idx++] = (uint8_t)buf[i];
-        temp.push_back(to_string((buf[i]+2)/4));  // in Celsius (x 0.25)
+        if (args.enableDiff) {
+          diff = (int)buf[i] - prevFrame[idx];
+          frameBuf[idx] = (uint8_t)(diff * DIFF_MAGNIFICATION + 128);  // add 0x80(128) so that negative values can be seen.
+          prevFrame[idx++] = (int)buf[i];
+          temp.push_back(to_string(diff));  // in Celsius (x 0.25)
+        } else {
+          frameBuf[idx++] = (uint8_t)buf[i];
+          temp.push_back(to_string((buf[i]+2)/4));  // in Celsius (x 0.25)
+        }
       }
-#endif
     }
   }
 }
