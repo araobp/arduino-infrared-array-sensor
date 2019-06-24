@@ -2,7 +2,7 @@
 
 <img src="doc/shield.jpg" width=300>
 
-AMG8833 is an infrared array sensor product from Panasonic. It is very popular among Arduino users.
+[AMG8833](https://cdn-learn.adafruit.com/assets/assets/000/043/261/original/Grid-EYE_SPECIFICATIONS%28Reference%29.pdf?1498680225) is an infrared array sensor product from Panasonic. It is very popular among Arduino users.
 
 ## Development environment
 
