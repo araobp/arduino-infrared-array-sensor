@@ -7,4 +7,4 @@ void interpolate(Mat &src, Mat &dst, int repeat=1);
 
 void magnify(Mat &src, Mat &dst, int magnification); 
 
-void putTempText(Mat &src, int magnification, vector<string> &temp); 
+void putTempText(Mat &src, int magnification, vector<string> &temp, bool colorBlack=false); 

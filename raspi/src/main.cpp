@@ -99,6 +99,8 @@ int main(int argc, char* argv[]) {
   Mat magnified = Mat(Size(8*args.magnification*(int)pow(4.0,(float)args.repeat), 8*args.magnification*(int)pow(4.0,(float)args.repeat)), CV_8U);
   Mat colored;
   vector<string> temp;
+  Mat labels;
+  vector<string> labelsStr;
 
   while (true) {
     bytes_read = read(fd, &buf, 1);
@@ -119,10 +121,17 @@ int main(int argc, char* argv[]) {
           interpolate(img, interpolated, args.repeat);
           magnify(interpolated, magnified, args.magnification);
         } else {
+          if (args.applyBinalization) {
+            threshold(img, img, BIN_THRES, 255, THRESH_BINARY);
+            connectedComponents(img, labels, 8, CV_16U);
+            labelsStr.clear();
+            for (int y = 0; y < img.rows; y++) {
+              for (int x = 0; x < img.cols; x++) {
+                labelsStr.push_back(to_string(labels.at<uint16_t>(y,x)));
+              }
+            }
+          }
           magnify(img, magnified, args.magnification);
-        }
-        if (args.applyBinalization) {
-          threshold(magnified, magnified, BIN_THRES, 255, THRESH_BINARY);
         }
         if (args.applyBlur) {
           blur(magnified, magnified, Size(11,11), Point(-1,-1));
@@ -134,8 +143,12 @@ int main(int argc, char* argv[]) {
           applyColorMap(colored, colored, COLORMAP_JET);
         }
         if (idx >= 64) {
-          if (!args.repeat && args.withTemp) {
-            putTempText(colored, args.magnification, temp);
+          if (!args.repeat) {
+            if (args.withTemp) {
+              putTempText(colored, args.magnification, temp, args.applyColorMapHot);
+            } else if (args.applyBinalization) {
+              putTempText(colored, args.magnification, labelsStr, args.applyColorMapHot);
+            }
           }
           imshow("Thermography", colored);
         }

@@ -31,20 +31,25 @@ void magnify(Mat &src, Mat &dst, int magnification) {
 /*
  *  * Super-impose temperature data on the image
  *   */
-void putTempText(Mat &src, int magnification, vector<string> &temp) {
+void putTempText(Mat &src, int magnification, vector<string> &temp, bool colorBlack) {
 
   int font = FONT_HERSHEY_SIMPLEX;
   int x_offset = 12*magnification/64;
   int y_offset = magnification - 22*magnification/64;
   int xx, yy;
   int i = 0;
+  int color = 255;
+
+  if (colorBlack) {
+  color = 0;
+  }
 
   for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
             xx = x_offset + x * magnification;
             yy = y_offset + y * magnification;
             string &t = temp.at(i);
-            putText(src, t, Point(xx, yy), font, (float)magnification/64.0, Scalar(255,255,255), 1+magnification/64, LINE_AA);
+            putText(src, t, Point(xx, yy), font, (float)magnification/64.0, Scalar(color,color,color), 1+magnification/64, LINE_AA);
             i++;
           }
     }
