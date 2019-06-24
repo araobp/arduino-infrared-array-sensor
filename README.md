@@ -77,11 +77,13 @@ The GUI supports binalization:
 $ bin/thermo -m 32 -H -B
 ```
 
-### Diff between frames: gradiente(=velocity)
+### Diff between frames: gradient(=velocity)
 
-The GUI supports image diff between frames:
+The GUI supports image diff between frames.
 
 <img src="./doc/diff.png" width=200>
+
+Waving my hand over the sensor.
 
 ```
 $ bin/thermo -m 32 -d
