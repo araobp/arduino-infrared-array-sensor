@@ -19,7 +19,7 @@ Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasP
 ```
 ## Data frame format (raster-scan 8x8 pixel image) over VCP/USB
 
-The program on Arduino transfers 8x8 pixel image data to RasPi over VCP/USB in the following data format:
+The program on Arduino transfers 8x8 pixel image data to RasPi over VCP/USB at 10fps in the following data format:
 
 ```
    [BEGIN(0xFE)][byte#0]...[byte#63][END(0xFF)]
