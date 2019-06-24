@@ -45,7 +45,7 @@ $ make
 $ bin/thermo -m 64 -t -b
 ```
 
-GUI developed in a native language (c/c++) runs fast on RasPi 3!
+GUI developed in a native language (C/C++) runs fast on RasPi 3!
 
 ### Bicubic interpolation
 
@@ -59,16 +59,20 @@ This is my right hand.
 $ bin/thermo -m 1 -i 3
 ```
 
+With "-H" option, the GUI uses COLORMAP_HOT instead COLORMAP_JET:
+
+<img src="./doc/hot.png" width=200>
+
+```
+$ bin/thermo -m 3 -i 2 -H -b
+```
+
 ### Binalization
+
+The GUI supports binalization:
 
 <img src="./doc/binalization.png" width=200>
 
 ```
 $ bin/thermo -m 1 -i 3 -H -B
 ```
-
-### Hand gesture classification
-
-I have already experimented on deep learning such as CNN or DCT(for image pre-processing) + DNN in [this project](https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-F401RE/AI) for hand gesture classification. It took a lot of time and efforts to train the neural network.
-
-This time I will try a classical method on OpenCV: image binalization and pattern matching.
