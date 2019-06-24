@@ -69,7 +69,7 @@ $ bin/thermo -m 3 -i 2 -H -b
 
 ### Binalization
 
-The GUI supports binalization:
+The GUI supports binalization, useful for counting the number of people in a room:
 
 <img src="./doc/binalization.png" width=200>
 
@@ -79,7 +79,7 @@ $ bin/thermo -m 32 -H -B
 
 ### Diff between frames: gradient(=velocity)
 
-The GUI supports image diff between frames.
+The GUI supports image diff between frames, useful for detecting motion of something:
 
 <img src="./doc/diff.png" width=200>
 
