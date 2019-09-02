@@ -69,9 +69,9 @@ With "-H" option, the GUI uses COLORMAP_HOT instead COLORMAP_JET:
 $ bin/thermo -m 3 -i 2 -H -b
 ```
 
-### Binalization
+### Binarization
 
-The GUI supports binalization, useful for counting the number of people in a room:
+The GUI supports binarization, useful for counting the number of people in a room:
 
 <img src="./doc/binalization.png" width=200>
 
