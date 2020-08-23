@@ -9,7 +9,6 @@
 - Arduino IDE on RasPi 3.
 - vi and g++ on RasPi 3.
 - OpenCV3 for thermography GUI development.
-- OpenCV4 and Android Studio for GUI development on Android.
 
 Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasPi3 taking a half day.
 
