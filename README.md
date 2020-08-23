@@ -91,12 +91,3 @@ Waving my hand over the sensor.
 ```
 $ bin/thermo -m 32 -d
 ```
-
-## Running GUI on Android
-
-(Work in progress)
-
-### OpenCV setup for Android
-
-In this project, I use "opencv-4.4.0-android-sdk.zip" from SOURCE FORGE: https://sourceforge.net/projects/opencvlibrary/files/4.4.0/
-
