@@ -10,8 +10,8 @@ class Amg8833Interface(context: Context, baudrate: Int, val receiver: IDataRecei
     companion object {
         val TAG: String = this::class.java.simpleName
 
-        val BEGIN = 0xFE.toUByte()
-        val END = 0xFFU.toUByte()
+        val BEGIN = 0xFE.toByte()
+        val END = 0xFFU.toByte()
     }
 
     enum class StateMachine {
@@ -27,14 +27,14 @@ class Amg8833Interface(context: Context, baudrate: Int, val receiver: IDataRecei
 
     override fun parse(messageFraction: ByteArray, len: Int) {
         for (i in 0 until len) {
-            val b = messageFraction[i].toUByte()
+            val b = messageFraction[i]
 
             if (state == StateMachine.BEGIN_WAITING && b == BEGIN) {
                 state = StateMachine.DATA_RECEIVING
             } else if (state == StateMachine.DATA_RECEIVING) {
                 when (idx < 64) {
                     true -> {
-                        data[idx++] = b
+                        data[idx++] = b.toUByte()
                     }
                     false -> {
                         if (b == END) {
