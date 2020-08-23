@@ -90,3 +90,14 @@ Waving my hand over the sensor.
 ```
 $ bin/thermo -m 32 -d
 ```
+
+## Android app for visualization
+
+(Work in progress)
+
+### OpenCV setup for Android
+
+Reference: ["A Beginner’s Guide to Setting up OpenCV Android Library on Android Studio"](https://android.jlelse.eu/a-beginners-guide-to-setting-up-opencv-android-library-on-android-studio-19794e220f3c)
+
+In this project, I use "opencv-4.4.0-android-sdk.zip" from SOURCE FORGE: https://sourceforge.net/projects/opencvlibrary/files/4.4.0/
+
