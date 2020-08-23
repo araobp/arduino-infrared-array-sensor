@@ -26,7 +26,7 @@ The program on Arduino transfers 8x8 pixel image data to RasPi over VCP/USB at 1
 ```
 ## Arduino shield of AMG8833
 
-==>[schematic](./kicad/arduino_board.pdf)
+=> [schematic](./kicad/arduino_board.pdf)
 
 Note: the shield is powered by 3V3 pin on Arduino UNO. Although Arduino UNO is a 5V system, the circuit works.
 
