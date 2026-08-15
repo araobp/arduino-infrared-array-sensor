@@ -80,6 +80,8 @@ python python/viewer_swipe.py
 
 ### 1. Main Thermal Camera Viewer (`python/viewer.py`)
 
+<img src="doc/smooth-off.png" width=200 alt="Smooth OFF"> <img src="doc/smooth-on.png" width=200 alt="Smooth ON"> <img src="doc/hand-hot.png" width=200 alt="Colormap HOT"> <img src="doc/diff-10x.png" width=200 alt="Frame Diff">
+
 * **Auto Serial Port Detection**: Detects Arduino/USB serial devices on macOS, Linux, and Windows automatically.
 * **Interpolation & Smoothing**: Toggle between smooth Gaussian interpolation and sharp 8x8 pixel matrix.
 * **Colormap Selection**: Easily switch colormaps (`JET`, `HOT`, `INFERNO`, `PLASMA`, `COOLWARM`, `VIRIDIS`).
