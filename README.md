@@ -1,92 +1,94 @@
-# Arduino with infrared array sensor
+# Arduino with Infrared Array Sensor (AMG8833)
 
-<img src="doc/shield.jpg" width=300>
+<img src="doc/shield.jpg" width=320 alt="Arduino AMG8833 Shield">
 
-[AMG8833](https://cdn-learn.adafruit.com/assets/assets/000/043/261/original/Grid-EYE_SPECIFICATIONS%28Reference%29.pdf?1498680225) is an infrared array sensor product from Panasonic. It is very popular among Arduino users.
+> **Project Background & Retrospective**:  
+> When this project was first created in **2019**—in the pre-generative AI era—the author put tremendous effort into hand-crafting every line of the native C++/OpenCV3 code and Arduino sketch from scratch.  
+> Today, revisiting this project with the assistance of **Antigravity**, the entire architecture was modernized around an **Arduino + Python** workflow, firmware timing was made rock-solid, and an interactive thermal GUI viewer was produced in a fraction of the time with remarkably superior code quality. It is a remarkable testament to how generative AI has transformed software development—enabling developers to elevate and rebuild projects with unprecedented speed and excellence.
 
-## Development environment
+[AMG8833 (Grid-EYE)](https://cdn-learn.adafruit.com/assets/assets/000/043/261/original/Grid-EYE_SPECIFICATIONS%28Reference%29.pdf?1498680225) is an 8x8 infrared array thermopile sensor from Panasonic. This project provides a complete real-time thermal camera system using Arduino UNO and an interactive cross-platform Python viewer.
 
-- Arduino IDE on RasPi 3.
-- vi and g++ on RasPi 3.
-- OpenCV3 for thermography GUI development.
+---
 
-Note: you have to install OpenCV3 on Raspi3. In my case, I built OpenCV3 on RasPi3 taking a half day.
-
-## Architecture
+## System Architecture
 
 ```
-    [GUI/RasPi3]/dev/ttyACM0----VCP/USB----[Arduino]----I2C----[AMG8833]
-```
-## Data frame format (raster-scan 8x8 pixel image) over VCP/USB
-
-The program on Arduino transfers 8x8 pixel image data to RasPi over VCP/USB at 10fps in the following data format:
-
-```
-   [BEGIN(0xFE)][byte#0]...[byte#63][END(0xFF)]
-```
-## Arduino shield of AMG8833
-
-=> [schematic](./kicad/arduino_board.pdf)
-
-Note: the shield is powered by 3V3 pin on Arduino UNO. Although Arduino UNO is a 5V system, the circuit works.
-
-## Code
-
-- [Arduino](./arduino)
-- [RasPi](./raspi)
-
-## Building and running GUI on Raspberry Pi
-
-<img src="./doc/this_is_me.png" width=200>
-
-This is me!
-
-```
-$ cd raspi
-$ make
-$ bin/thermo -m 64 -t -b
+[AMG8833 Sensor] --I2C (400kHz)--> [Arduino UNO] --USB Serial (115200bps)--> [Python GUI Viewer]
 ```
 
-GUI developed in a native language (C/C++) runs fast on RasPi 3!
+- **Arduino UNO**: Reads 8x8 thermal pixels over I2C at 400kHz, formats frames at 10 FPS with non-blocking timing, and streams data over USB Serial.
+- **Python Viewer**: Cross-platform interactive thermal camera application (macOS, Linux, Windows) with auto port detection, real-time colormaps, smoothing, binarization, and motion detection.
 
-### Bicubic interpolation
+---
 
-The resolution of AMG8833 is only 8x8 pixels. I applied bicubic interpolation to the original 8x8 pixel image for higher resolution.
+## Hardware & Shield
 
-<img src="./doc/bicubic_interpolation.png" width=200>
+- **Schematic**: [kicad/arduino_board.pdf](./kicad/arduino_board.pdf)
+- **KiCad Design Files**: [kicad/](./kicad/)
 
-This is my right hand.
+> **Note**: The shield is powered by the `3V3` pin of the Arduino UNO. Although Arduino UNO is a 5V logic system, the I2C interface communicates reliably.
 
-```
-$ bin/thermo -m 1 -i 3
-```
+---
 
-With "-H" option, the GUI uses COLORMAP_HOT instead COLORMAP_JET:
+## Data Frame Format (VCP / USB Serial)
 
-<img src="./doc/hot.png" width=200>
-
-```
-$ bin/thermo -m 3 -i 2 -H -b
-```
-
-### Binarization
-
-The GUI supports binarization, useful for counting the number of people in a room:
-
-<img src="./doc/binalization.png" width=200>
+The Arduino transmits 8x8 pixel frames (raster scan) at 10 FPS with the following packet structure:
 
 ```
-$ bin/thermo -m 32 -H -B
+[BEGIN (0xFE)][byte#0] ... [byte#63][END (0xFF)]
 ```
 
-### Diff between frames: gradient(=velocity)
+- **Resolution / Scale**: Each byte represents temperature in 0.25°C increments (`Temperature (°C) = byte / 4`).
+- **Delimiter Protection**: Pixel bytes are clamped to `0xFD` (~63.25°C) to prevent frame synchronization collisions with `0xFE` (BEGIN) and `0xFF` (END).
 
-The GUI supports image diff between frames, useful for detecting motion of something:
+---
 
-<img src="./doc/diff.png" width=200>
+## Quick Start
 
-Waving my hand over the sensor.
+### 1. Upload Arduino Firmware
 
+1. Connect your Arduino UNO to your computer.
+2. Open [`arduino/sketch_amg8833/sketch_amg8833.ino`](./arduino/sketch_amg8833/sketch_amg8833.ino) in the Arduino IDE.
+3. Select board `Arduino Uno` and the corresponding serial port.
+4. Upload the sketch.
+
+### 2. Launch Python Thermal Viewer
+
+Install dependencies and run the viewer:
+
+```bash
+# 1. Install dependencies
+pip install -r python/requirements.txt
+
+# 2. Run the viewer (auto-detects Arduino port)
+python python/viewer.py
 ```
-$ bin/thermo -m 32 -d
-```
+
+---
+
+## Python Thermal Viewer Features
+
+<img src="doc/this_is_me.png" width=220 alt="Thermal Sample"> <img src="doc/hot.png" width=220 alt="Hot Colormap"> <img src="doc/diff.png" width=220 alt="Frame Diff">
+
+- **Auto Serial Port Detection**: Detects Arduino/USB serial devices on macOS, Linux, and Windows automatically.
+- **Interpolation & Smoothing**: Toggle between smooth Gaussian interpolation and sharp 8x8 pixel matrix.
+- **Colormap Selection**: Easily switch colormaps (`JET`, `HOT`, `INFERNO`, `PLASMA`, `COOLWARM`, `VIRIDIS`).
+- **Temperature Overlay**: Display real-time numeric temperature values (°C) overlaid on each pixel.
+- **Dynamic Auto Scale & Sliders**: Adjust `vmin` / `vmax` limits manually or toggle dynamic auto-scaling.
+- **Binarization & Island Labeling**: Real-time connected-component analysis for occupant / object counting.
+- **Frame Difference (Motion Detection)**: Temporal gradient diffing to highlight moving heat sources.
+
+---
+
+## Repository Structure
+
+- **[`arduino/`](./arduino)**: Arduino UNO firmware sketch ([`sketch_amg8833.ino`](./arduino/sketch_amg8833/sketch_amg8833.ino)).
+- **[`python/`](./python)**: Cross-platform interactive Matplotlib thermal camera viewer ([`viewer.py`](./python/viewer.py)).
+- **[`kicad/`](./kicad)**: Hardware schematic and PCB shield design files.
+- **[`raspi/`](./raspi)**: *(Maintenance Mode)* Legacy native C++/OpenCV3 viewer for Raspberry Pi 3. See [**raspi/README.md**](./raspi/README.md) for build instructions and legacy documentation.
+
+---
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
