@@ -117,14 +117,12 @@ A specialized, ultra-lightweight thermal difference visualizer featuring real-ti
 
 ## Repository Structure
 
-* **[`arduino/`](https://www.google.com/search?q=./arduino)**: Arduino UNO firmware sketch ([`sketch_amg8833.ino`](https://www.google.com/search?q=./arduino/sketch_amg8833/sketch_amg8833.ino)).
-* **[`python/`](https://www.google.com/search?q=./python)**: Cross-platform Python thermal viewer applications:
-* [`viewer.py`](https://www.google.com/search?q=./python/viewer.py): Feature-rich interactive thermal camera viewer.
-* [`viewer_swipe.py`](https://www.google.com/search?q=./python/viewer_swipe.py): Compact thermal differential & gesture recognition viewer.
-
-
-* **[`kicad/`](https://www.google.com/search?q=./kicad)**: Hardware schematic and PCB shield design files.
-* **[`raspi/`](https://www.google.com/search?q=./raspi)**: *(Maintenance Mode)* Legacy native C++/OpenCV3 viewer for Raspberry Pi 3. See **[raspi/README.md](https://www.google.com/search?q=./raspi/README.md)** for build instructions and legacy documentation.
+- **`arduino/`**: Arduino UNO firmware sketch (`sketch_amg8833.ino`).
+- **`python/`**: Cross-platform Python thermal viewer applications:
+  - `viewer.py`: Feature-rich interactive thermal camera viewer.
+  - `viewer_swipe.py`: Compact thermal differential & gesture recognition viewer.
+- **`kicad/`**: Hardware schematic and PCB shield design files.
+- **`raspi/`**: *(Maintenance Mode)* Legacy native C++/OpenCV3 viewer for Raspberry Pi 3. See `raspi/README.md` for build instructions and legacy documentation.
 
 ---
 
