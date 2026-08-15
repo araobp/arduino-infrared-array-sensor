@@ -68,7 +68,7 @@ python python/viewer.py
 
 ## Python Thermal Viewer Features
 
-<img src="doc/smooth-off.png" width=200 alt="Smooth OFF"> <img src="doc/smooth-on.png" width=200 alt="Smooth ON"> <img src="doc/hand-hot.png" width=200 alt="Colormap HOT"> <img src="doc/diff.png" width=200 alt="Frame Diff">
+<img src="doc/smooth-off.png" width=200 alt="Smooth OFF"> <img src="doc/smooth-on.png" width=200 alt="Smooth ON"> <img src="doc/hand-hot.png" width=200 alt="Colormap HOT"> <img src="doc/diff-10x.png" width=200 alt="Frame Diff">
 
 - **Auto Serial Port Detection**: Detects Arduino/USB serial devices on macOS, Linux, and Windows automatically.
 - **Interpolation & Smoothing**: Toggle between smooth Gaussian interpolation and sharp 8x8 pixel matrix.
