@@ -108,7 +108,7 @@ python python/earth_gesture_controller.py
 
 ### 2. Compact Thermal Diff & Gesture Controller (`python/earth_gesture_controller.py`)
 
-<img src="doc/swipe-left.png" width=200 alt="Swipe Left"> <img src="doc/swipe-right.png" width=200 alt="Swipe Right"> 
+<img src="doc/swipe-left.png" width=200 alt="Swipe Left"> <img src="doc/swipe-right.png" width=200 alt="Swipe Right"> <img src="doc/earth.png" width=200 alt="Earth"> 
 
 A specialized, lightweight thermal difference visualizer featuring real-time horizontal hand gesture recognition and UDP event broadcasting. It works both as a standalone thermal viewer and as a gesture controller for external applications.
 
