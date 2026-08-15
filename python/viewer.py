@@ -126,15 +126,21 @@ def main():
             row_texts.append(txt)
         text_grid.append(row_texts)
 
-    # GUI widgets for controlling modes & Quit
-    ax_auto = fig.add_axes([0.08, 0.200, 0.22, 0.035])
-    ax_smooth = fig.add_axes([0.32, 0.200, 0.22, 0.035])
-    ax_temp = fig.add_axes([0.56, 0.200, 0.22, 0.035])
+    # GUI widgets for controlling modes & Quit (All 8 buttons identical width = 0.20)
+    btn_w = 0.20
+    btn_h = 0.035
+    x_col1, x_col2, x_col3, x_col4 = 0.065, 0.290, 0.515, 0.740
+    y_row1, y_row2 = 0.200, 0.150
 
-    ax_cmap_btn = fig.add_axes([0.08, 0.150, 0.22, 0.035])
-    ax_bin = fig.add_axes([0.32, 0.150, 0.22, 0.035])
-    ax_diff = fig.add_axes([0.56, 0.150, 0.22, 0.035])
-    ax_quit = fig.add_axes([0.80, 0.150, 0.14, 0.035])
+    ax_auto = fig.add_axes([x_col1, y_row1, btn_w, btn_h])
+    ax_smooth = fig.add_axes([x_col2, y_row1, btn_w, btn_h])
+    ax_diff = fig.add_axes([x_col3, y_row1, btn_w, btn_h])
+    ax_diff_mag = fig.add_axes([x_col4, y_row1, btn_w, btn_h])
+
+    ax_cmap_btn = fig.add_axes([x_col1, y_row2, btn_w, btn_h])
+    ax_bin = fig.add_axes([x_col2, y_row2, btn_w, btn_h])
+    ax_temp = fig.add_axes([x_col3, y_row2, btn_w, btn_h])
+    ax_quit = fig.add_axes([x_col4, y_row2, btn_w, btn_h])
 
     ax_vmin = fig.add_axes([0.22, 0.092, 0.65, 0.025])
     ax_vmax = fig.add_axes([0.22, 0.042, 0.65, 0.025])
@@ -154,7 +160,7 @@ def main():
     btn_cmap.on_clicked(toggle_dropdown)
 
     for i, c_name in enumerate(COLORMAP_OPTIONS):
-        ax_item = fig.add_axes([0.08, 0.190 + i * 0.035, 0.22, 0.034])
+        ax_item = fig.add_axes([x_col1, 0.190 + i * 0.035, btn_w, 0.034])
         btn_item = Button(ax_item, c_name, color="0.95", hovercolor="#77dd77")
         ax_item.set_visible(False)
         dropdown_axes.append(ax_item)
@@ -274,6 +280,26 @@ def main():
 
     btn_diff.on_clicked(toggle_diff)
 
+    # 6. Diff Magnification Toggle Button (10x vs 1x)
+    diff_mag_10x = [True]
+    btn_diff_mag = Button(
+        ax_diff_mag, "Diff: 10x", color="#77dd77", hovercolor="#55bb55"
+    )
+
+    def toggle_diff_mag(event):
+        diff_mag_10x[0] = not diff_mag_10x[0]
+        if diff_mag_10x[0]:
+            btn_diff_mag.label.set_text("Diff: 10x")
+            btn_diff_mag.color = "#77dd77"
+            btn_diff_mag.hovercolor = "#55bb55"
+        else:
+            btn_diff_mag.label.set_text("Diff: 1x")
+            btn_diff_mag.color = "0.85"
+            btn_diff_mag.hovercolor = "0.75"
+        fig.canvas.draw_idle()
+
+    btn_diff_mag.on_clicked(toggle_diff_mag)
+
     # Sliders setup without red initial line, with ticks
     s_vmin = Slider(ax_vmin, "Min Temp (°C)", -10, 100, valinit=0, valstep=1)
     s_vmax = Slider(ax_vmax, "Max Temp (°C)", -10, 100, valinit=40, valstep=1)
@@ -351,8 +377,9 @@ def main():
                 display_grid = binary_mask.astype(np.float32)
                 im.set_cmap("gray")
             elif diff_mode[0]:
+                mag_factor = 10.0 if diff_mag_10x[0] else 1.0
                 if prev_temp_grid is not None:
-                    display_grid = temp_grid - prev_temp_grid
+                    display_grid = (temp_grid - prev_temp_grid) * mag_factor
                 else:
                     display_grid = np.zeros((ROWS, COLS), dtype=np.float32)
                 prev_temp_grid = temp_grid.copy()
@@ -376,7 +403,10 @@ def main():
                                 text_grid[r][c].set_visible(False)
                         elif diff_mode[0]:
                             val = display_grid[r, c]
-                            text_grid[r][c].set_text(f"{int(round(val)):+d}")
+                            if diff_mag_10x[0]:
+                                text_grid[r][c].set_text(f"{int(round(val)):+d}")
+                            else:
+                                text_grid[r][c].set_text(f"{val:+.1f}")
                             text_grid[r][c].set_visible(True)
                         else:
                             val = display_grid[r, c]
@@ -397,6 +427,7 @@ def main():
                     if vmin == vmax:
                         vmax = vmin + 1.0
                 else:
+                    # Fixed diff scale range (-10°C to +10°C) so that 10x magnification visibly intensifies the colormap
                     vmin, vmax = -10.0, 10.0
                 im.set_clim(vmin=vmin, vmax=vmax)
             else:

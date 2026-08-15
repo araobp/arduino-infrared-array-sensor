@@ -68,7 +68,7 @@ python python/viewer.py
 
 ## Python Thermal Viewer Features
 
-<img src="doc/this_is_me.png" width=220 alt="Thermal Sample"> <img src="doc/hot.png" width=220 alt="Hot Colormap"> <img src="doc/diff.png" width=220 alt="Frame Diff">
+<img src="doc/smooth-off.png" width=200 alt="Smooth OFF"> <img src="doc/smooth-on.png" width=200 alt="Smooth ON"> <img src="doc/hand-hot.png" width=200 alt="Colormap HOT"> <img src="doc/diff.png" width=200 alt="Frame Diff">
 
 - **Auto Serial Port Detection**: Detects Arduino/USB serial devices on macOS, Linux, and Windows automatically.
 - **Interpolation & Smoothing**: Toggle between smooth Gaussian interpolation and sharp 8x8 pixel matrix.
@@ -76,7 +76,21 @@ python python/viewer.py
 - **Temperature Overlay**: Display real-time numeric temperature values (°C) overlaid on each pixel.
 - **Dynamic Auto Scale & Sliders**: Adjust `vmin` / `vmax` limits manually or toggle dynamic auto-scaling.
 - **Binarization & Island Labeling**: Real-time connected-component analysis for occupant / object counting.
-- **Frame Difference (Motion Detection)**: Temporal gradient diffing to highlight moving heat sources.
+- **Frame Difference (Motion Detection)**: Temporal gradient diffing to highlight moving heat sources. Includes an interactive **Diff: 10x / 1x** toggle button to scale temperature differences by 10x across both the colormap heatmap and numerical overlay.
+
+### Control Panel Reference
+
+| Control Button | Function |
+| :--- | :--- |
+| **`Auto Scale`** | Toggle dynamic min/max color-scale adaptation. |
+| **`Smooth`** | Toggle Gaussian smoothing vs. raw 8x8 matrix. |
+| **`Diff`** | Toggle frame-difference motion detection mode. |
+| **`Diff: 10x / 1x`** | Switch motion difference magnification (10x vs 1x). |
+| **`Cmap ▾`** | Select colormap from dropdown menu. |
+| **`Binarize`** | Object thresholding and connected-component labeling. |
+| **`Show Temp`** | Display numerical temperature/label on each pixel. |
+| **`Quit`** | Safely close the viewer and release serial port. |
+| **Sliders (`Min / Max Temp`)** | Manually adjust colorbar temperature limits (°C). |
 
 ---
 
