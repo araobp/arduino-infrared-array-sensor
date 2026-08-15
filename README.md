@@ -108,6 +108,8 @@ python python/viewer_swipe.py
 
 ### 2. Compact Thermal Diff & Swipe Gesture Viewer (`python/viewer_swipe.py`)
 
+<img src="doc/swipe-left.png" width=200 alt="Swipe Left"> <img src="doc/swipe-right.png" width=200 alt="Swipe Right"> 
+
 A specialized, ultra-lightweight thermal difference visualizer featuring real-time horizontal hand gesture recognition.
 
 * **Thermal Differential Mode**: Focuses purely on frame-to-frame thermal variations without spatial interpolation (`interpolation="nearest"`).
