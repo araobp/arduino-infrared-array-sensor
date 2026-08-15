@@ -1,3 +1,4 @@
+import socket
 import sys
 import time
 import cv2
@@ -15,6 +16,10 @@ NUM_PIXELS = ROWS * COLS
 
 BEGIN_BYTE = b"\xfe"
 END_BYTE = b"\xff"
+
+# UDP Target Configuration
+UDP_IP = "127.0.0.1"  # Destination IP address (localhost)
+UDP_PORT = 4242
 
 # Threshold choices for gesture detection sensitivity
 THRESHOLD_OPTIONS = ("Low (0.5)", "Medium (1.0)", "High (1.5)", "Ultra (2.0)")
@@ -90,6 +95,9 @@ def detect_gesture(prev_grid, curr_grid, threshold):
 
 
 def main():
+    # 0. Initialize UDP Socket
+    udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     # 1. Dynamically find serial port
     serial_port = auto_find_port()
     if not serial_port:
@@ -241,6 +249,7 @@ def main():
 
     prev_temp_grid = None
     last_gesture_time = 0.0
+    GESTURE_COOLDOWN = 1.0  # 一振りを完全に終えるまでの非受付時間 (秒)
 
     print("Starting Thermal Diff & Gesture Viewer... Press Ctrl+C or click Quit to exit.")
 
@@ -277,14 +286,18 @@ def main():
                 gesture = detect_gesture(prev_temp_grid, temp_grid, current_threshold[0])
                 curr_time = time.time()
                 
-                if gesture and (curr_time - last_gesture_time > 0.6):  # Debounce gesture detection
+                # 振りの最初を検出した場合のみ1度だけ実行 (デバウンス処理)
+                if gesture and (curr_time - last_gesture_time > GESTURE_COOLDOWN):
                     last_gesture_time = curr_time
+                    
                     if gesture == "RIGHT":
                         gesture_text.set_text(">>> SWIPE RIGHT >>>")
                         gesture_text.set_color("#00FFCC")
+                        udp_sock.sendto(b"swipe right", (UDP_IP, UDP_PORT))
                     elif gesture == "LEFT":
                         gesture_text.set_text("<<< SWIPE LEFT <<<")
                         gesture_text.set_color("#FF3366")
+                        udp_sock.sendto(b"swipe left", (UDP_IP, UDP_PORT))
             else:
                 display_grid = np.zeros((ROWS, COLS), dtype=np.float32)
 
@@ -315,6 +328,7 @@ def main():
         print("\nStopping viewer...")
     finally:
         ser.close()
+        udp_sock.close()
         plt.ioff()
         plt.close("all")
         print("Application closed successfully.")

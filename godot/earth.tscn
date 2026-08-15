@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://d2168humgomjx"]
+
+[ext_resource type="Script" uid="uid://c3xvh5schfwpy" path="res://scripts/udp_server.gd" id="1_2bhor"]
+[ext_resource type="Texture2D" uid="uid://clx1xtvfw54gs" path="res://textures/world.200408.3x5400x2700.jpg" id="2_5i67w"]
+[ext_resource type="Script" uid="uid://rrryv0dvwo1w" path="res://scripts/earth.gd" id="3_trc54"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_4xowi"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_noarx"]
+albedo_texture = ExtResource("2_5i67w")
+
+[node name="Node3D" type="Node3D" unique_id=827434178]
+script = ExtResource("1_2bhor")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=100932178]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+fov = 12.0
+
+[node name="Earth" type="MeshInstance3D" parent="." unique_id=739383508]
+mesh = SubResource("SphereMesh_4xowi")
+surface_material_override/0 = SubResource("StandardMaterial3D_noarx")
+script = ExtResource("3_trc54")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1059707807]
+transform = Transform3D(0.5674513, -0.72706085, -0.38649964, 0.82017875, 0.54061526, 0.18719642, 0.07284424, -0.42322344, 0.9030924, -4.698577, 2.7504926, 0)
+light_energy = 2.0
