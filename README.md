@@ -69,8 +69,8 @@ pip install -r python/requirements.txt
 # 2. Run the main viewer (auto-detects Arduino port)
 python python/viewer.py
 
-# Or run the compact swipe gesture viewer
-python python/viewer_swipe.py
+# Or run the compact swipe gesture viewer to control the Earth in Godot
+python python/earth_gesture_controller.py
 
 ```
 
@@ -106,25 +106,29 @@ python python/viewer_swipe.py
 
 ---
 
-### 2. Compact Thermal Diff & Swipe Gesture Viewer (`python/viewer_swipe.py`)
+### 2. Compact Thermal Diff & Gesture Controller (`python/earth_gesture_controller.py`)
 
-<img src="doc/swipe-left.png" width=200 alt="Swipe Left"> <img src="doc/swipe-right.png" width=200 alt="Swipe Right"> 
+<img src="doc/swipe-left.png" width=200 alt="Swipe Left"> <img src="doc/swipe-right.png" width=200 alt="Swipe Right"> <img src="doc/earth.png" width=400 alt="Earth"> 
 
-A specialized, ultra-lightweight thermal difference visualizer featuring real-time horizontal hand gesture recognition.
+A specialized, lightweight thermal difference visualizer featuring real-time horizontal hand gesture recognition and UDP event broadcasting. It works both as a standalone thermal viewer and as a gesture controller for external applications.
 
-* **Thermal Differential Mode**: Focuses purely on frame-to-frame thermal variations without spatial interpolation (`interpolation="nearest"`).
+* **Standalone or Interactive Control**: Functions perfectly as a standalone thermal difference viewer, or can be paired with the Godot **`earth`** project to interactively rotate a 3D Earth using hand swipe gestures.
+* **Thermal Differential Mode**: Focuses purely on frame-to-frame thermal variations using raw pixel mapping (`interpolation="nearest"`).
 * **Swipe Gesture Detection**: Employs Farneback optical flow over thermal gradients to accurately classify `SWIPE LEFT` and `SWIPE RIGHT` gestures.
-* **Sensitivity Threshold Selection**: Interactive drop-down menu (`Thresh: 1.0 ▾`) allowing on-the-fly adjustment of gesture detection sensitivity (`Low 0.5`, `Medium 1.0`, `High 1.5`, `Ultra 2.0`).
-* **Streamlined Single-Window Layout**: Compact single window containing 10x differential magnification toggle, text overlay, sensitivity drop-down menu, and quit button.
+* **UDP Gesture Streaming**: Broadcasts detected swipe events (`swipe left` / `swipe right`) via ASCII UDP packets (Port 4242) for real-time external control.
+* **Single-Event Triggering**: Sends only a single event per swipe motion to ensure stable, non-spammy control.
+* **Sensitivity Threshold Selection**: Features an interactive drop-down menu (`Thresh: 1.0 ▾`) for on-the-fly threshold adjustments (`Low 0.5`, `Medium 1.0`, `High 1.5`, `Ultra 2.0`).
+* **Streamlined Single-Window UI**: Integrates a 10x differential magnification toggle, numeric text overlay, sensitivity menu, and quit button into a compact window.
 
 ---
 
 ## Repository Structure
 
 - **`arduino/`**: Arduino UNO firmware sketch (`sketch_amg8833.ino`).
-- **`python/`**: Cross-platform Python thermal viewer applications:
+- **`python/`**: Cross-platform Python thermal viewer and gesture controller applications:
   - `viewer.py`: Feature-rich interactive thermal camera viewer.
-  - `viewer_swipe.py`: Compact thermal differential & gesture recognition viewer.
+  - `earth_gesture_controller.py`: Compact thermal differential viewer & gesture controller (works standalone or integrated with Godot via UDP).
+- **`godot/`**: Optional Godot 3D project (`earth`) for interactive gesture-controlled globe rotation.
 - **`kicad/`**: Hardware schematic and PCB shield design files.
 - **`raspi/`**: *(Maintenance Mode)* Legacy native C++/OpenCV3 viewer for Raspberry Pi 3. See `raspi/README.md` for build instructions and legacy documentation.
 
